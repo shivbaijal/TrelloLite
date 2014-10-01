@@ -16,9 +16,8 @@
 
 @interface TLCardsViewController () <MDCSwipeToChooseDelegate>
 
-@property (assign) BOOL loading;
-@property (strong) NSMutableArray *cards;
-@property (strong) NSMutableArray *lists;
+@property (nonatomic, strong) NSMutableArray *cards;
+@property (nonatomic, strong) NSArray *lists;
 @property (nonatomic, strong) TLCardView *firstCardView;
 @property (nonatomic, strong) TLCardView *secondCardView;
 
@@ -39,6 +38,7 @@
     return self;
 }
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -46,8 +46,8 @@
     [self.view addSubview:self.firstCardView];
     
     self.view.backgroundColor = [UIColor colorWithRed:35/225.0f green:113/255.0f blue:159/255.0f alpha:1.0];
-    
 }
+
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -65,91 +65,65 @@
 #pragma mark - Get Data
 
 - (void)fetchCards {
-    if (self.loading) {
-        return;
-    }
-    self.loading = YES;
-    
-    
     __weak typeof(self) weakSelf = self;
-    [[TLAPIClient sharedInstance] fetchListsWithBoardID:self.board.boardID includingCards:YES callback:^(id responseObject, NSError *error) {
-        if (responseObject) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                NSArray *listsArray = responseObject;
-                NSMutableArray *updatedLists = [@[] mutableCopy];
-                for (NSDictionary *listDictionary in listsArray) {
-                    NSError *error = nil;
-                    TLList *list = [MTLJSONAdapter modelOfClass:[TLList class] fromJSONDictionary:listDictionary error:&error];
-                    [updatedLists addObject:list];
-                }
-                weakSelf.lists = updatedLists;
-                weakSelf.cards = [((TLList *)[weakSelf.lists firstObject]).cards mutableCopy];
-                weakSelf.loading = NO;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf addCardsToView];
-                    [SVProgressHUD dismiss];
-                });
+    [[TLAPIClient sharedInstance] fetchListsWithBoardID:self.board.boardID includingCards:YES success:^(id responseObject) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            weakSelf.lists = [TLList listsFromJSON:responseObject];
+            weakSelf.cards = [((TLList *)[weakSelf.lists firstObject]).cards mutableCopy];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf addCardsToView];
+                [SVProgressHUD dismiss];
             });
-        } else {
-            weakSelf.loading = NO;
-        }
+        });
+    } failure:^(NSError *error) {
     }];
 }
 
+#pragma mark - MDCSwipeToChooseDelegate + Helper Methods
+
+- (void)view:(UIView *)view wasChosenWithDirection:(MDCSwipeDirection)direction {
+    __weak typeof(self) weakSelf = self;
+    if (direction == MDCSwipeDirectionLeft) {
+        [[TLAPIClient sharedInstance] moveCardWithIDToTheBottomOfItsList:self.firstCardView.card.cardID success:^(id responseObject) {
+            [weakSelf.cards addObject:weakSelf.firstCardView.card];
+            [weakSelf updateCardViews];
+        } failure:^(NSError *error) {
+            
+        }];
+    } else {
+        [[TLAPIClient sharedInstance] archiveCardWithID:self.firstCardView.card.cardID success:^(id responseObject) {
+            [weakSelf updateCardViews];
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+}
+
+#pragma mark - TLCardView methods
+
 - (void)addCardsToView {
     if ([self.cards count] > 0) {
-        self.firstCardView.card = [self.cards firstObject];
-        [self.cards removeObjectAtIndex:0];
-        
+        self.firstCardView.card = [self poppedNextCard];
         if ([self.cards count] > 0) {
             self.secondCardView = [[TLCardView alloc] initWithFrame:[self cardViewFrame] options:[self swipeOptions]];
-            self.secondCardView.card = [self.cards firstObject];
-            [self.cards removeObjectAtIndex:0];
+            self.secondCardView.card = [self poppedNextCard];
             [self.view insertSubview:self.secondCardView belowSubview:self.firstCardView];
         }
     }
 }
 
-#pragma mark - MDCSwipeToChooseDelegate + Helper Methods
-
-
-- (void)view:(UIView *)view wasChosenWithDirection:(MDCSwipeDirection)direction {
-    if (direction == MDCSwipeDirectionLeft) {
-        [[TLAPIClient sharedInstance] moveCardWithIDToTheBottomOfItsList:self.firstCardView.card.cardID callback:^(id responseObject, NSError *error) {
-            if (responseObject) {
-                [self.cards addObject:self.firstCardView.card];
-                [self updateCardViews];
-            } else {
-            }
-        }];
-    } else {
-        [[TLAPIClient sharedInstance] archiveCardWithID:self.firstCardView.card.cardID callback:^(id responseObject, NSError *error) {
-            if (responseObject) {
-                [self updateCardViews];
-            } else {
-            }
-        }];
-    }
-
-}
 
 - (void)updateCardViews {
     if ([self.cards count] > 0) {
-        TLCardView *cardToReuse = self.firstCardView;
-        [cardToReuse prepareForReuse]; //is this necessary
-        cardToReuse.transform = CGAffineTransformIdentity;
-        cardToReuse.frame = [self cardViewFrame];
-        cardToReuse.center = [self cardViewCenterPoint];
-        cardToReuse.card = [self.cards firstObject];
-        
-        [self.cards removeObjectAtIndex:0];
+        TLCardView *cardToReuse = [self reusableFirstCardView];
+        cardToReuse.card = [self poppedNextCard];
         
         self.firstCardView = self.secondCardView;
         self.secondCardView = cardToReuse;
         self.secondCardView.alpha = 0;
-
+        
         [self.view insertSubview:self.secondCardView belowSubview:self.firstCardView];
-        [UIView animateWithDuration:0.5
+        [UIView animateWithDuration:0.3
                               delay:0.0
                             options:UIViewAnimationOptionCurveEaseInOut
                          animations:^{
@@ -159,6 +133,22 @@
 
 }
 
+
+- (TLCard *)poppedNextCard {
+    TLCard *poppedCard = [self.cards firstObject];
+    [self.cards removeObjectAtIndex:0];
+    return poppedCard;
+}
+
+
+- (TLCardView *)reusableFirstCardView {
+    [self.firstCardView prepareForReuse];
+    self.firstCardView.frame = [self cardViewFrame];
+    self.firstCardView.center = [self cardViewCenterPoint];
+    return self.firstCardView;
+}
+
+
 - (MDCSwipeToChooseViewOptions *)swipeOptions {
     MDCSwipeToChooseViewOptions *options = [[MDCSwipeToChooseViewOptions alloc]  init];
     options.delegate = self;
@@ -167,9 +157,11 @@
     return options;
 }
 
+
 - (CGRect)cardViewFrame {
     return CGRectMake(16, 96, CGRectGetWidth(self.view.frame) - 32, CGRectGetHeight(self.view.frame) - 128);
 }
+
 
 - (CGPoint)cardViewCenterPoint {
     CGRect frame = [self cardViewFrame];
@@ -178,6 +170,5 @@
     center.y = CGRectGetMinY(frame) + (CGRectGetHeight(frame) / 2.0);
     return center;
 }
-
 
 @end

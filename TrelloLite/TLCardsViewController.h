@@ -11,6 +11,6 @@
 
 @interface TLCardsViewController : UIViewController
 
-@property (strong, nonatomic) TLBoard *board;
+@property (nonatomic, strong) TLBoard *board;
 
 @end

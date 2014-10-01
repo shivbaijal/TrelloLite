@@ -9,25 +9,31 @@
 #import <Foundation/Foundation.h>
 #import "AFHTTPSessionManager.h"
 
-typedef void (^TLAPICallback)(id responseObject, NSError *error);
+typedef void (^TLSuccessBlock)(id responseObject);
+typedef void (^TLFailureBlock)(NSError *error);
 
 @interface TLAPIClient : AFHTTPSessionManager
 
 @property (nonatomic, copy) NSString *key;
-
 @property (nonatomic, copy) NSString *token;
 
 
 + (instancetype)sharedInstance;
 
-- (void)fetchOpenBoards:(TLAPICallback)callback;
-- (void)fetchBoardWithID:(NSString *)boardID callback:(TLAPICallback)callback;
-- (void)fetchListsWithBoardID:(NSString *)boardID includingCards:(BOOL)includingCards callback:(TLAPICallback)callback;
+- (void)fetchOpenBoardsWithSuccess:(TLSuccessBlock)success
+                           failure:(TLFailureBlock)failure;
 
-//may not need this
-- (void)fetchCardsWithListID:(NSString *)listID callback:(TLAPICallback)callback;
+- (void)fetchListsWithBoardID:(NSString *)boardID
+               includingCards:(BOOL)includingCards
+                      success:(TLSuccessBlock)success
+                      failure:(TLFailureBlock)failure;
 
-- (void)archiveCardWithID:(NSString *)cardID callback:(TLAPICallback)callback;
-- (void)moveCardWithIDToTheBottomOfItsList:(NSString *)cardID callback:(TLAPICallback)callback;
+- (void)archiveCardWithID:(NSString *)cardID
+                  success:(TLSuccessBlock)success
+                  failure:(TLFailureBlock)failure;
+
+- (void)moveCardWithIDToTheBottomOfItsList:(NSString *)cardID
+                                   success:(TLSuccessBlock)success
+                                   failure:(TLFailureBlock)failure;
 
 @end

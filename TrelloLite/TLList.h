@@ -15,4 +15,6 @@
 @property (nonatomic, copy, readonly) NSString *name;
 @property (nonatomic, copy, readonly) NSArray *cards;
 
++ (NSArray *)listsFromJSON:(id)JSON;
+
 @end

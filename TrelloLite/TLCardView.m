@@ -48,7 +48,7 @@
             self.nameLabel.frame = CGRectMake(16, 32, CGRectGetWidth(self.frame)-32, CGRectGetHeight(self.frame) - 64);
             self.nameLabel.adjustsFontSizeToFitWidth = YES;
         } else {
-            self.nameLabel.frame = CGRectMake(16, (CGRectGetHeight(self.frame) - nameLabelHeight)/2.0, CGRectGetWidth(self.frame)-32, nameLabelHeight);
+            self.nameLabel.frame = CGRectMake(16, (CGRectGetHeight(self.frame) - nameLabelHeight)/2.0f, CGRectGetWidth(self.frame)-32, nameLabelHeight);
         }
     }
 }
@@ -67,6 +67,7 @@
 - (void)prepareForReuse {
     self.likedView.alpha = 0;
     self.nopeView.alpha = 0;
+    self.transform = CGAffineTransformIdentity;
 }
 
 

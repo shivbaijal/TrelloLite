@@ -15,8 +15,7 @@
 
 @interface TLBoardsViewController () <UITableViewDataSource, UITableViewDelegate>
 
-@property (assign) BOOL loading;
-@property (strong) NSArray *boards;
+@property (nonatomic, strong) NSArray *boards;
 @property (nonatomic, strong) UITableView *tableView;
 
 @end
@@ -42,8 +41,10 @@
     return self;
 }
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.tableView.frame = self.view.bounds;
     [self.view addSubview:self.tableView];
     
@@ -51,6 +52,7 @@
     
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
 }
+
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -61,33 +63,18 @@
 #pragma mark - Get Data
 
 - (void)fetchBoards {
-    if (self.loading) {
-        return;
-    }
-    self.loading = YES;
-
     __weak typeof(self) weakSelf = self;
-    [[TLAPIClient sharedInstance] fetchOpenBoards:^(id responseObject, NSError *error) {
-        if (responseObject) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                NSArray *boardsArray = responseObject;
-                NSMutableArray *updatedBoards = [@[] mutableCopy];
-                for (NSDictionary *boardDictionary in boardsArray) {
-                    NSError *error = nil;
-                    TLBoard *board = [MTLJSONAdapter modelOfClass:[TLBoard class] fromJSONDictionary:boardDictionary error:&error];
-                    [updatedBoards addObject:board];
-                }
-                weakSelf.boards = [updatedBoards copy];
-                weakSelf.loading = NO;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf.tableView reloadData];
-                    [SVProgressHUD dismiss];
-                });
+    [[TLAPIClient sharedInstance] fetchOpenBoardsWithSuccess:^(id responseObject) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            weakSelf.boards = [TLBoard boardsFromJSON:responseObject];;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.tableView reloadData];
+                [SVProgressHUD dismiss];
             });
-        } else {
-            weakSelf.loading = NO;
-        }
+        });
+    } failure:^(NSError *error) {
     }];
+    
 }
 
 #pragma mark - UITableViewDelegate Methods
@@ -95,6 +82,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 80.0;
 }
+
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
@@ -121,11 +109,11 @@
     return cell;
 }
 
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     TLCardsViewController *cardsVC = [[TLCardsViewController alloc] init];
     cardsVC.board = ((TLBoard *)[self.boards objectAtIndex:indexPath.row]);
     [self.navigationController pushViewController:cardsVC animated:YES];
 }
-
 
 @end

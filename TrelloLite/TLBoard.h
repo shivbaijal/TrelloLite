@@ -14,4 +14,6 @@
 @property (nonatomic, copy, readonly) NSString *boardID;
 @property (nonatomic, copy, readonly) NSString *name;
 
++ (NSArray *)boardsFromJSON:(id)JSON;
+
 @end

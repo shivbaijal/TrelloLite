@@ -15,9 +15,9 @@
 		5853C36B19C6B1B2008A1A41 /* TrelloLiteTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5853C36A19C6B1B2008A1A41 /* TrelloLiteTests.m */; };
 		5853C37619C6BA7E008A1A41 /* TLAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 5853C37519C6BA7E008A1A41 /* TLAPIClient.m */; };
 		5853C37919C6C423008A1A41 /* TLCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 5853C37819C6C423008A1A41 /* TLCard.m */; };
+		585E66B019DB9C6100AAF6A1 /* TLCardsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 585E66AF19DB9C6100AAF6A1 /* TLCardsViewController.m */; };
 		589CA3BE19C7712A000D2D99 /* TLBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = 589CA3BD19C7712A000D2D99 /* TLBoard.m */; };
 		589CA3C119C7732D000D2D99 /* TLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 589CA3C019C7732D000D2D99 /* TLList.m */; };
-		58B3C16619C8B605003E7CDF /* TLCardsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B3C16519C8B605003E7CDF /* TLCardsViewController.m */; };
 		58B3C16919C8B7F1003E7CDF /* TLCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B3C16819C8B7F1003E7CDF /* TLCardView.m */; };
 		58B3C16C19C92C27003E7CDF /* TLBoardTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B3C16B19C92C27003E7CDF /* TLBoardTableViewCell.m */; };
 		614E3CE772394DF2948BD665 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1C63EEEE2D14789BBEE752B /* libPods.a */; };
@@ -50,12 +50,12 @@
 		5853C37519C6BA7E008A1A41 /* TLAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLAPIClient.m; sourceTree = "<group>"; };
 		5853C37719C6C422008A1A41 /* TLCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCard.h; sourceTree = "<group>"; };
 		5853C37819C6C423008A1A41 /* TLCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCard.m; sourceTree = "<group>"; };
+		585E66AE19DB9C6100AAF6A1 /* TLCardsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCardsViewController.h; sourceTree = "<group>"; };
+		585E66AF19DB9C6100AAF6A1 /* TLCardsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCardsViewController.m; sourceTree = "<group>"; };
 		589CA3BC19C7712A000D2D99 /* TLBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLBoard.h; sourceTree = "<group>"; };
 		589CA3BD19C7712A000D2D99 /* TLBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLBoard.m; sourceTree = "<group>"; };
 		589CA3BF19C7732D000D2D99 /* TLList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLList.h; sourceTree = "<group>"; };
 		589CA3C019C7732D000D2D99 /* TLList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLList.m; sourceTree = "<group>"; };
-		58B3C16419C8B605003E7CDF /* TLCardsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TLCardsViewController.h; path = ../TLCardsViewController.h; sourceTree = "<group>"; };
-		58B3C16519C8B605003E7CDF /* TLCardsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TLCardsViewController.m; path = ../TLCardsViewController.m; sourceTree = "<group>"; };
 		58B3C16719C8B7F0003E7CDF /* TLCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCardView.h; sourceTree = "<group>"; };
 		58B3C16819C8B7F1003E7CDF /* TLCardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCardView.m; sourceTree = "<group>"; };
 		58B3C16A19C92C27003E7CDF /* TLBoardTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLBoardTableViewCell.h; sourceTree = "<group>"; };
@@ -112,8 +112,8 @@
 				5853C35319C6B1B1008A1A41 /* TLAppDelegate.m */,
 				5853C35519C6B1B1008A1A41 /* TLBoardsViewController.h */,
 				5853C35619C6B1B1008A1A41 /* TLBoardsViewController.m */,
-				58B3C16419C8B605003E7CDF /* TLCardsViewController.h */,
-				58B3C16519C8B605003E7CDF /* TLCardsViewController.m */,
+				585E66AE19DB9C6100AAF6A1 /* TLCardsViewController.h */,
+				585E66AF19DB9C6100AAF6A1 /* TLCardsViewController.m */,
 				5853C37419C6BA7E008A1A41 /* TLAPIClient.h */,
 				5853C37519C6BA7E008A1A41 /* TLAPIClient.m */,
 				5853C35B19C6B1B1008A1A41 /* Images.xcassets */,
@@ -315,6 +315,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				585E66B019DB9C6100AAF6A1 /* TLCardsViewController.m in Sources */,
 				58B3C16C19C92C27003E7CDF /* TLBoardTableViewCell.m in Sources */,
 				5853C37919C6C423008A1A41 /* TLCard.m in Sources */,
 				5853C35719C6B1B1008A1A41 /* TLBoardsViewController.m in Sources */,
@@ -323,7 +324,6 @@
 				5853C35419C6B1B1008A1A41 /* TLAppDelegate.m in Sources */,
 				589CA3BE19C7712A000D2D99 /* TLBoard.m in Sources */,
 				5853C35119C6B1B1008A1A41 /* main.m in Sources */,
-				58B3C16619C8B605003E7CDF /* TLCardsViewController.m in Sources */,
 				589CA3C119C7732D000D2D99 /* TLList.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

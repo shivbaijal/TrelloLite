@@ -17,4 +17,16 @@
     };
 }
 
+
++ (NSArray *)boardsFromJSON:(id)JSON {
+    NSArray *boardsJSONArray = JSON;
+    NSMutableArray *boards = [@[] mutableCopy];
+    for (NSDictionary *boardDictionary in boardsJSONArray) {
+        NSError *error = nil;
+        TLBoard *board = [MTLJSONAdapter modelOfClass:[self class] fromJSONDictionary:boardDictionary error:&error];
+        [boards addObject:board];
+    }
+    return boards;
+}
+
 @end

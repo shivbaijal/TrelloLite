@@ -7,6 +7,8 @@
 //
 
 #import "TLAPIClient.h"
+#import "TLBoard.h"
+#import "TLList.h"
 
 @implementation TLAPIClient
 
@@ -19,62 +21,51 @@
     return instance;
 }
 
-- (void)fetchOpenBoards:(TLAPICallback)callback {
-    [self GET:[self URLStringWithPath:@"members/me/boards"] parameters:@{@"filter":@[@"open"], @"lists":@"open"} success:^(NSURLSessionDataTask *task, id responseObject) {
-        callback(responseObject, nil);
+
+- (void)fetchOpenBoardsWithSuccess:(TLSuccessBlock)success failure:(TLFailureBlock)failure {
+    NSString *relativeURLString = [NSString stringWithFormat:@"members/me/boards?key=%@&token=%@", self.key, self.token];
+    NSDictionary *params = @{@"filter":@[@"open"], @"lists":@"open"};
+    [self GET:relativeURLString parameters:params success:^(NSURLSessionDataTask *task, id responseObject) {
+        success(responseObject);
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        callback(nil, error);
+        failure(error);
     }];
 }
 
-- (void)fetchBoardWithID:(NSString *)boardID callback:(TLAPICallback)callback {
-    [self GET:[self URLStringWithPath:[NSString stringWithFormat:@"boards/%@", boardID]] parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        callback(responseObject, nil);
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        callback(nil, error);
-    }];
-}
 
-- (void)fetchListsWithBoardID:(NSString *)boardID includingCards:(BOOL)includingCards callback:(TLAPICallback)callback {
-    NSDictionary *cardsInfo;
+- (void)fetchListsWithBoardID:(NSString *)boardID includingCards:(BOOL)includingCards success:(TLSuccessBlock)success failure:(TLFailureBlock)failure {
+    NSString *relativeURLString = [NSString stringWithFormat:@"boards/%@/lists?key=%@&token=%@", boardID, self.key, self.token];
+    NSDictionary *params;
     if (includingCards) {
-        cardsInfo = @{@"cards":@"open"};
+        params = @{@"cards":@"open"};
     }
-    [self GET:[self URLStringWithPath:[NSString stringWithFormat:@"boards/%@/lists", boardID]] parameters:cardsInfo success:^(NSURLSessionDataTask *task, id responseObject) {
-        callback(responseObject, nil);
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        callback(nil, error);
-    }];
-}
-
-- (void)fetchCardsWithListID:(NSString *)listID callback:(TLAPICallback)callback {
-    [self GET:[self URLStringWithPath:[NSString stringWithFormat:@"lists/%@/cards", listID]] parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        callback(responseObject, nil);
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        callback(nil, error);
-    }];
-}
-
-- (void)archiveCardWithID:(NSString *)cardID callback:(TLAPICallback)callback {
-    [self PUT:[self URLStringWithPath:[NSString stringWithFormat:@"cards/%@/closed", cardID]] parameters:@{@"value":@YES} success:^(NSURLSessionDataTask *task, id responseObject) {
-        callback(responseObject, nil);
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        callback(nil, error);
-    }];
-}
-
-- (void)moveCardWithIDToTheBottomOfItsList:(NSString *)cardID callback:(TLAPICallback)callback {
-    [self PUT:[self URLStringWithPath:[NSString stringWithFormat:@"cards/%@/pos", cardID]] parameters:@{@"value":@"bottom"} success:^(NSURLSessionDataTask *task, id responseObject) {
-        callback(responseObject, nil);
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        callback(nil, error);
+    [self GET:relativeURLString parameters:params success:^(NSURLSessionDataTask *task, id responseObject) {
+            success(responseObject);
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            failure(error);
     }];
 }
 
 
-- (NSString *)URLStringWithPath:(NSString *)path {
-    return [NSString stringWithFormat:@"%@?key=%@&token=%@", path, self.key, self.token];
+- (void)archiveCardWithID:(NSString *)cardID success:(TLSuccessBlock)success failure:(TLFailureBlock)failure {
+    NSString *relativeURLString = [NSString stringWithFormat:@"cards/%@/closed?key=%@&token=%@", cardID, self.key, self.token];
+    NSDictionary *params = @{@"value":@YES};
+    [self PUT:relativeURLString parameters:params success:^(NSURLSessionDataTask *task, id responseObject) {
+        success(responseObject);
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        failure(error);
+    }];
 }
 
+
+- (void)moveCardWithIDToTheBottomOfItsList:(NSString *)cardID success:(TLSuccessBlock)success failure:(TLFailureBlock)failure {
+    NSString *relativeURLString = [NSString stringWithFormat:@"cards/%@/pos?key=%@&token=%@", cardID, self.key, self.token];
+    NSDictionary *params = @{@"value":@"bottom"};
+    [self PUT:relativeURLString parameters:params success:^(NSURLSessionDataTask *task, id responseObject) {
+        success(responseObject);
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        failure(error);
+    }];
+}
 
 @end

@@ -19,8 +19,21 @@
     };
 }
 
+
 + (NSValueTransformer *)cardsJSONTransformer {
     return [NSValueTransformer mtl_JSONArrayTransformerWithModelClass:[TLCard class]];
+}
+
+
++ (NSArray *)listsFromJSON:(id)JSON {
+    NSArray *listsJSONArray = JSON;
+    NSMutableArray *lists = [@[] mutableCopy];
+    for (NSDictionary *listDictionary in listsJSONArray) {
+        NSError *error = nil;
+        TLList *list = [MTLJSONAdapter modelOfClass:[self class] fromJSONDictionary:listDictionary error:&error];
+        [lists addObject:list];
+    }
+    return lists;
 }
 
 @end
